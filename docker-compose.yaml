@@ -1,0 +1,34 @@
+version: '2'
+
+services:
+  ros-master:
+    image: ros:kinetic-ros-core
+    command: stdbuf -o L roscore
+    environment:
+       - ROS_HOSTNAME=127.0.0.1
+    ports:
+      - "11311:11311"
+      - "45100:45100"
+      - "45101:45101"
+      - "45102:45102"
+    restart: always
+
+  talker:
+    image: ros:kinetic-ros-core
+    depends_on:
+      - ros-master
+    environment:
+      - ROS_MASTER_URI=http://127.0.0.1:11311
+    command: stdbuf -o L rostopic pub /chatter std_msgs/String "hello" -r 1
+    network_mode: "host"
+    restart: always
+
+  listener:
+    image: ros:kinetic-ros-core
+    depends_on:
+      - ros-master
+    environment:
+      - ROS_MASTER_URI=http://127.0.0.1:11311
+    command: stdbuf -o L rostopic echo /chatter
+    network_mode: "host"
+    restart: always

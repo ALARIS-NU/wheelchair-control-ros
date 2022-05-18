@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <link rel="stylesheet" href="/static/css/w3.css" />
+        <link rel="stylesheet" href="/static/css/w3-theme.css" />
+        <link rel="stylesheet" href="/static/css/slider.css" />
+        <script defer src="/static/js/cdn.min.js"></script>
+        <title>ALARIS Wheelchair Control</title>
+    </head>
+    <body x-data="{isConnected:{{ .isConnected }}}" style="width: 100%; max-width: 500px; margin: auto;" class="w3-border">
+        <div class="w3-container w3-theme">
+            <h1>ALARIS Wheelchair Control</h1>
+        </div>
+        <div x-show="!isConnected">
+            <h2>Status: <span x-text="isConnected?'':'Not '+'Connected'"></span></h2>
+            <button class="w3-button w3-theme-l3" onclick="location.reload();">Reload page</button>
+        </div>
+        <div x-show="isConnected">
+            <div x-data="{ Channels: ['ch1', 'ch2', 'ch3', 'ch4'] }">
+                <button @click="sendAction('/action/on')" class="w3-button w3-theme-l3">Turn On</button>
+                <button @click="sendAction('/action/off')" class="w3-button w3-theme-l3">Turn off</button>
+                <button @click="sendAction('/action/horn')" class="w3-button w3-theme-l3">Horn</button>
+                <button @click="setTo0" class="w3-button w3-theme-l3">Set to 0</button>
+
+                <div>
+                    <template x-ref="sliderz" x-for="(Channel, index) in Channels" :key="index">
+                        <div class="slidecontainer" x-data="{ count: 0 }">
+                            Channel (<span x-text="Channel"></span>) - <span x-text="count">0</span>V
+                            <input @change="sliderEvent(index,count)" x-model="count" type="range" min="0" max="5" step="0.1" value="0" class="slider">
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        let body = document.querySelector('body')
+        
+
+        async function sendAction(req) {
+            this.posts = await (await fetch(req)).json();
+            if (this.posts.error == "not connected"){
+                location.reload()
+            }
+            console.log(this.posts);
+        }
+
+        async function checkConnection() {
+            fetch('/status').then((res) => res.json()).then((data) => {
+                if (!data.isConnected){
+                    
+                }
+            })
+        }
+
+        function setTo0(){
+            for (i=0; i<4; i++){
+                sliderEvent(i, 0);
+                location.reload();
+            }
+        }
+
+        function sliderEvent(id, val){
+            sendAction('/action/'+id+'/'+ Math.round(val / 5 * 255));
+            console.log(id+' '+val);
+        }
+    </script>
+    <script defer>
+        checkConnection()
+    </script>
+</html>
