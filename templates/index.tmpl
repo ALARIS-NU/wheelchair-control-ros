@@ -17,17 +17,19 @@
             <button class="w3-button w3-theme-l3" onclick="location.reload();">Reload page</button>
         </div>
         <div x-show="isConnected">
-            <div x-data="{ Channels: ['ch1', 'ch2', 'ch3', 'ch4'] }">
+            <div x-data="{ Channels: ['ch1', 'ch2'] }">
                 <button @click="sendAction('/action/on')" class="w3-button w3-theme-l3">Turn On</button>
                 <button @click="sendAction('/action/off')" class="w3-button w3-theme-l3">Turn off</button>
                 <button @click="sendAction('/action/horn')" class="w3-button w3-theme-l3">Horn</button>
-                <button @click="setTo0" class="w3-button w3-theme-l3">Set to 0</button>
+                <button @click="sendAction('/action/speedUp')" class="w3-button w3-theme-l3">Speed Up</button>
+                <button @click="sendAction('/action/speedDown')" class="w3-button w3-theme-l3">Speed Down</button>
+                <button @click="setTo0" class="w3-button w3-theme-l3">Set to 2.5</button>
 
                 <div>
                     <template x-ref="sliderz" x-for="(Channel, index) in Channels" :key="index">
-                        <div class="slidecontainer" x-data="{ count: 0 }">
-                            Channel (<span x-text="Channel"></span>) - <span x-text="count">0</span>V
-                            <input @change="sliderEvent(index,count)" x-model="count" type="range" min="0" max="5" step="0.1" value="0" class="slider">
+                        <div class="slidecontainer" x-data="{ count: 3.42 }">
+                            Channel (<span x-text="Channel"></span>) - <span x-text="Math.round(100*(count/5*3.65))/100"></span>V <span x-text="'pwm set to '+count+'V'" class="w3-opacity-max w3-tiny"></span>
+                            <input @change="sliderEvent(index,count)" x-model="count" type="range" min="1.84" max="5" step="0.01" class="slider">
                         </div>
                     </template>
                 </div>
@@ -56,10 +58,11 @@
         }
 
         function setTo0(){
-            for (i=0; i<4; i++){
-                sliderEvent(i, 0);
-                location.reload();
+            for (i=0; i<2; i++){
+                sliderEvent(i, 3.42);
+                
             }
+            location.reload();
         }
 
         function sliderEvent(id, val){
@@ -69,5 +72,8 @@
     </script>
     <script defer>
         checkConnection()
+        for (i=0; i<2; i++){
+                sliderEvent(i, 3.42);
+        }
     </script>
 </html>

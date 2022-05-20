@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"reflect"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -13,20 +14,25 @@ import (
 func rx(f io.ReadWriteCloser) {
 	// buff := make([]byte, 100)
 	for {
-
-		buf := make([]byte, 32)
-		n, err := f.Read(buf)
-		if err != nil {
-			if err != io.EOF {
-				fmt.Println("Error reading from serial port: ", err)
-				f.Close()
-				Arduino.isConnected = false
-				break
+		for {
+			buf := make([]byte, 32)
+			n, err := f.Read(buf)
+			if err != nil {
+				if err != io.EOF {
+					fmt.Println("Error reading from serial port: ", err)
+					f.Close()
+					Arduino.isConnected = false
+					break
+				}
+			} else {
+				buf = buf[:n]
+				color.Yellow("%s", string(buf))
+				color.Cyan("%s", hex.Dump(buf))
 			}
-		} else {
-			buf = buf[:n]
-			color.Yellow("%s", string(buf))
-			color.Cyan("%s", hex.Dump(buf))
+		}
+		for !Arduino.isConnected {
+			time.Sleep(time.Second * 1)
+			color.Yellow("retrying Arduino connection")
 		}
 	}
 }

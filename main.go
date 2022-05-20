@@ -114,6 +114,28 @@ func main() {
 				ctx.JSON(500, gin.H{"error": "not connected"})
 			}
 		})
+		r.GET("/action/speedDown", func(ctx *gin.Context) {
+			EasyTransferSend(port, commandPack{Action: byte(CSmaller)})
+			if Arduino.isConnected {
+				ctx.JSON(200, gin.H{
+					"status": "ok",
+					"action": "speed Down",
+				})
+			} else {
+				ctx.JSON(500, gin.H{"error": "not connected"})
+			}
+		})
+		r.GET("/action/speedUp", func(ctx *gin.Context) {
+			EasyTransferSend(port, commandPack{Action: byte(CBigger)})
+			if Arduino.isConnected {
+				ctx.JSON(200, gin.H{
+					"status": "ok",
+					"action": "speed Up",
+				})
+			} else {
+				ctx.JSON(500, gin.H{"error": "not connected"})
+			}
+		})
 		r.GET("/action/:ch_name/:value", func(ctx *gin.Context) {
 			var command commandPack
 			if err := ctx.ShouldBindUri(&command); err != nil {
