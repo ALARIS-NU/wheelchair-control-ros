@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="/static/css/w3-theme.css" />
         <link rel="stylesheet" href="/static/css/slider.css" />
         <script defer src="/static/js/cdn.min.js"></script>
+        <script src="/static/js/joy.js"></script>
         <title>ALARIS Wheelchair Control</title>
     </head>
     <body x-data="{isConnected:{{ .isConnected }}}" style="width: 100%; max-width: 500px; margin: auto;" class="w3-border">
@@ -34,6 +35,7 @@
                     </template>
                 </div>
             </div>
+            <div id="joyDiv" style="width:200px;height:200px;margin:auto;"></div>
         </div>
     </body>
 
@@ -75,5 +77,16 @@
         for (i=0; i<2; i++){
                 sliderEvent(i, 3.42);
         }
+        var joyParam = {
+             "internalFillColor": "#839ef0",
+             "internalStrokeColor" : "#839ef0",
+             "externalStrokeColor" : "#839ef0",
+        };
+        var joy = new JoyStick('joyDiv',joyParam);
+        setInterval(function(){
+            sendAction('/action/'+0+'/'+ Math.round((34900+161*joy.GetY())/200));
+            sendAction('/action/'+1+'/'+ Math.round((34900+161*joy.GetX())/200));
+            // console.log( Math.round((34900+161*joy.GetX())/200)  ); 
+        }, 100);
     </script>
 </html>

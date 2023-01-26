@@ -32,7 +32,8 @@ func main() {
 
 	isROSneeded := flag.Bool("ros", false, "do you need a ros node?")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
-	wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
+	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
+	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path")
 	boudRate := flag.Int("rate", 115200, "serial boudrate uint (9600,115200,?)")
 	flag.Parse()
 
