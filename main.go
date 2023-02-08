@@ -34,7 +34,7 @@ func main() {
 	Arduino.mode = "slider"
 
 	isUARTlogsNeeded := flag.Bool("uart", false, "do you need uart logs?")
-	isROSneeded := flag.Bool("ros", false, "do you need a ros node?")
+	isROSneeded := flag.Bool("ros", true, "do you need a ros node?")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
 	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
 	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path")
@@ -69,17 +69,6 @@ func main() {
 		r.LoadHTMLGlob("templates/*")
 
 		r.GET("/", func(c *gin.Context) {
-			// if Arduino.isConnected {
-			// 	c.HTML(200, "index.tmpl", gin.H{
-			// 		"isConnected": "true",
-			// 		"mode":"slider",
-			// 	})
-			// } else {
-			// 	c.HTML(200, "index.tmpl", gin.H{
-			// 		"isConnected": "false",
-			// 		"mode":"slider",
-			// 	})
-			// }
 			c.HTML(200, "index.tmpl", gin.H{
 				"isConnected": Arduino.isConnected,
 				"mode":Arduino.mode,

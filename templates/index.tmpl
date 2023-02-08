@@ -28,8 +28,8 @@
                 <button @click="setTo0" class="w3-button w3-theme-l3">Set to 2.5</button>
                 <select onchange="{
                     sendAction('changeModeTo'+this.value);
-                    setTimeout(function(){location.reload();}, 100);
-                    // location.reload();
+                    // setTimeout(function(){location.reload();}, 100);
+                    location.reload();
                 }">
                     <option value="Change input method" disabled selected>Change input method</option>
                     <option value="Slider">Slider</option>

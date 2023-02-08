@@ -8,25 +8,24 @@ import (
 )
 
 func initROS() {
-	n, err := goroslib.NewNode(goroslib.NodeConf{
+	node1, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "wheelchair_remote_sub",
 		MasterAddress: "192.168.0.220:11311",
 	})
 	if err != nil {
 		panic(err)
 	}
-	defer n.Close()
+	defer node1.Close()
 
-	// // create a subscriber
-	// sub, err := goroslib.NewSubscriber(goroslib.SubscriberConf{
-	// 	Node:     n,
-	// 	Topic:    "wheelchair_remote_topic",
-	// 	Callback: onMessage,
-	// })
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer sub.Close()
+	sub, err := goroslib.NewSubscriber(goroslib.SubscriberConf{
+		Node:     node1,
+		Topic:    "wheelchair_move_command",
+		Callback: onMessage,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer sub.Close()
 }
 
 func onMessage(msg *sensor_msgs.Imu) {
