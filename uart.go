@@ -26,8 +26,10 @@ func rx(f io.ReadWriteCloser) {
 				}
 			} else {
 				buf = buf[:n]
-				color.Yellow("%s", string(buf))
-				color.Cyan("%s", hex.Dump(buf))
+				if Arduino.logs {
+					color.Yellow("%s", string(buf))
+					color.Cyan("%s", hex.Dump(buf))
+				}
 			}
 		}
 		for !Arduino.isConnected {
@@ -70,9 +72,9 @@ func EasyTransferSend(port io.ReadWriteCloser, in commandPack) {
 	CS ^= in.Value
 
 	toOut = append(toOut, CS)
-	// if printUARTlogs {
-	color.Cyan("Writing %v, as %v bytes using EasyTransfer\n", in, toOut)
-	// }
+	if Arduino.logs {
+		color.Cyan("Writing %v, as %v bytes using EasyTransfer\n", in, toOut)
+	}
 	if Arduino.isConnected {
 		_, err := port.Write(toOut)
 		if err != nil {

@@ -9,9 +9,10 @@
         <script src="/static/js/joy.js"></script>
         <title>ALARIS Wheelchair Control</title>
     </head>
-    <body x-data="{isConnected:{{ .isConnected }}}" style="width: 100%; max-width: 500px; margin: auto;" class="w3-border">
+    <body x-data="{isConnected:{{ .isConnected }}, mode: '{{ .mode }}'}" style="width: 100%; max-width: 500px; margin: auto;" class="w3-border">
         <div class="w3-container w3-theme">
             <h1>ALARIS Wheelchair Control</h1>
+            <!-- <h2>Mode: {{.mode}}</h2> -->
         </div>
         <div x-show="!isConnected">
             <h2>Status: <span x-text="isConnected?'':'Not '+'Connected'"></span></h2>
@@ -25,8 +26,17 @@
                 <button @click="sendAction('/action/speedUp')" class="w3-button w3-theme-l3">Speed Up</button>
                 <button @click="sendAction('/action/speedDown')" class="w3-button w3-theme-l3">Speed Down</button>
                 <button @click="setTo0" class="w3-button w3-theme-l3">Set to 2.5</button>
+                <select onchange="{
+                    sendAction('changeModeTo'+this.value);
+                    setTimeout(function(){location.reload();}, 100);
+                    // location.reload();
+                }">
+                    <option value="Change input method" disabled selected>Change input method</option>
+                    <option value="Slider">Slider</option>
+                    <option value="Joystick">Joystick</option>
+                </select>
 
-                <div>
+                <div x-show="mode == 'slider'">
                     <template x-ref="sliderz" x-for="(Channel, index) in Channels" :key="index">
                         <div class="slidecontainer" x-data="{ count: 3.42 }">
                             Channel (<span x-text="Channel"></span>) - <span x-text="Math.round(100*(count/5*3.65))/100"></span>V <span x-text="'pwm set to '+count+'V'" class="w3-opacity-max w3-tiny"></span>
@@ -34,8 +44,12 @@
                         </div>
                     </template>
                 </div>
+                <div x-show="mode == 'joystick'">
+                    <div id="joyDiv" style="width:200px;height:200px;margin:auto;"></div>
+                </div>
+                
             </div>
-            <div id="joyDiv" style="width:200px;height:200px;margin:auto;"></div>
+            
         </div>
     </body>
 
@@ -83,10 +97,12 @@
              "externalStrokeColor" : "#839ef0",
         };
         var joy = new JoyStick('joyDiv',joyParam);
-        setInterval(function(){
-            sendAction('/action/'+0+'/'+ Math.round((34900+161*joy.GetY())/200));
-            sendAction('/action/'+1+'/'+ Math.round((34900+161*joy.GetX())/200));
-            // console.log( Math.round((34900+161*joy.GetX())/200)  ); 
-        }, 100);
+        if ('{{ .mode }}' == 'joystick') {
+            setInterval(function(){
+                sendAction('/action/'+0+'/'+ Math.round((34900+161*joy.GetY())/200));
+                sendAction('/action/'+1+'/'+ Math.round((34900+161*joy.GetX())/200));
+                // console.log( Math.round((34900+161*joy.GetX())/200)  ); 
+            }, 100);
+        }
     </script>
 </html>

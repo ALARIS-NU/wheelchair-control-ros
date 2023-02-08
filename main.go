@@ -9,6 +9,8 @@ import (
 
 type Device struct {
 	isConnected bool
+	mode string
+	logs bool
 }
 
 type command byte
@@ -29,13 +31,16 @@ var Arduino Device
 
 func main() {
 	Arduino.isConnected = false
+	Arduino.mode = "slider"
 
+	isUARTlogsNeeded := flag.Bool("uart", false, "do you need uart logs?")
 	isROSneeded := flag.Bool("ros", false, "do you need a ros node?")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
 	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
 	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path")
 	boudRate := flag.Int("rate", 115200, "serial boudrate uint (9600,115200,?)")
 	flag.Parse()
+	Arduino.logs = *isUARTlogsNeeded
 
 	// Set up options.
 	options := serial.OpenOptions{
@@ -64,22 +69,45 @@ func main() {
 		r.LoadHTMLGlob("templates/*")
 
 		r.GET("/", func(c *gin.Context) {
-			if Arduino.isConnected {
-				c.HTML(200, "index.tmpl", gin.H{
-					"isConnected": "true",
-				})
-			} else {
-				c.HTML(200, "index.tmpl", gin.H{
-					"isConnected": "false",
-				})
-			}
+			// if Arduino.isConnected {
+			// 	c.HTML(200, "index.tmpl", gin.H{
+			// 		"isConnected": "true",
+			// 		"mode":"slider",
+			// 	})
+			// } else {
+			// 	c.HTML(200, "index.tmpl", gin.H{
+			// 		"isConnected": "false",
+			// 		"mode":"slider",
+			// 	})
+			// }
+			c.HTML(200, "index.tmpl", gin.H{
+				"isConnected": Arduino.isConnected,
+				"mode":Arduino.mode,
+			})
 		})
 		// if Arduino.isConnected {
 		r.Static("/static", "./static")
 		// }
+		r.GET("/changeModeToSlider", func(c *gin.Context) {
+			Arduino.mode = "slider"
+			c.HTML(200, "index.tmpl", gin.H{
+				"isConnected": Arduino.isConnected,
+				"mode":Arduino.mode,
+			})
+		})
+
+		r.GET("/changeModeToJoystick", func(c *gin.Context) {
+			Arduino.mode = "joystick"
+			c.HTML(200, "index.tmpl", gin.H{
+				"isConnected": Arduino.isConnected,
+				"mode":Arduino.mode,
+			})
+		})
+
 		r.GET("/status", func(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"isConnected": Arduino.isConnected,
+				"mode":Arduino.mode,
 			})
 		})
 		r.GET("/action/on", func(ctx *gin.Context) {
