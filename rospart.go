@@ -10,7 +10,7 @@ import (
 func initROS() {
 	node1, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "wheelchair_remote_sub",
-		MasterAddress: "192.168.0.220:11311",
+		MasterAddress: Arduino.rosMasterAdress,
 	})
 	if err != nil {
 		panic(err)

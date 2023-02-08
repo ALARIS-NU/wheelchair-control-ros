@@ -5,12 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jacobsa/go-serial/serial"
+	"github.com/fatih/color"
 )
 
 type Device struct {
 	isConnected bool
 	mode string
 	logs bool
+	rosMasterAdress string
 }
 
 type command byte
@@ -35,12 +37,14 @@ func main() {
 
 	isUARTlogsNeeded := flag.Bool("uart", false, "do you need uart logs?")
 	isROSneeded := flag.Bool("ros", true, "do you need a ros node?")
+	rosMasterAdress := flag.String("rosMaster", "127.0.0.1:11311", "ros master adress")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
 	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
 	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path")
 	boudRate := flag.Int("rate", 115200, "serial boudrate uint (9600,115200,?)")
 	flag.Parse()
 	Arduino.logs = *isUARTlogsNeeded
+	Arduino.rosMasterAdress = *rosMasterAdress
 
 	// Set up options.
 	options := serial.OpenOptions{
@@ -65,6 +69,7 @@ func main() {
 	}
 
 	if *isGUIneeded {
+		color.Yellow("GUI is needed")
 		r := gin.Default()
 		r.LoadHTMLGlob("templates/*")
 
@@ -182,5 +187,7 @@ func main() {
 		r.Run()
 
 	}
+
+	for {}
 
 }
