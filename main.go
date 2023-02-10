@@ -13,6 +13,10 @@ type Device struct {
 	mode string
 	logs bool
 	rosMasterAdress string
+	
+	forward byte
+	right byte
+	
 }
 
 type command byte

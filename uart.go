@@ -49,6 +49,8 @@ func sendCommand(port io.ReadWriteCloser, action byte, x_axis float32, y_axis fl
 	y_byte := byte(y_axis + 100)
 	b := commandPack{action, x_byte, y_byte}
 	EasyTransferSend(port, b)
+	Arduino.forward = y_byte
+	Arduino.right = x_byte
 }
 
 type commandPack struct {
