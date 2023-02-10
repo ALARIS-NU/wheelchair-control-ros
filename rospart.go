@@ -44,21 +44,23 @@ func initROS() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 
-	for {
-		select {
-		// publish a message every second
-		case <-r.SleepChan():
-			msg := &std_msgs.UInt8MultiArray{
-				Data: []uint8{Arduino.forward, Arduino.right},
-			}
-			fmt.Printf("Outgoing: %+v\n", msg)
-			pub.Write(msg)
+	go func() {
+		for {
+			select {
+			// publish a message every second
+			case <-r.SleepChan():
+				msg := &std_msgs.UInt8MultiArray{
+					Data: []uint8{Arduino.forward, Arduino.right},
+				}
+				// fmt.Printf("Outgoing: %+v\n", msg)
+				pub.Write(msg)
 
-		// handle CTRL-C
-		case <-c:
-			return
+			// handle CTRL-C
+			case <-c:
+				return
+			}
 		}
-	}
+	}()
 }
 
 func onMessage(msg *sensor_msgs.Imu) {
