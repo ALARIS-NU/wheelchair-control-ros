@@ -3,20 +3,19 @@ package main
 import (
 	"flag"
 
+	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"github.com/jacobsa/go-serial/serial"
-	"github.com/fatih/color"
 )
 
 type Device struct {
-	isConnected bool
-	mode string
-	logs bool
+	isConnected     bool
+	mode            string
+	logs            bool
 	rosMasterAdress string
-	
+
 	forward byte
-	right byte
-	
+	right   byte
 }
 
 type command byte
@@ -68,7 +67,7 @@ func main() {
 		defer port.Close()
 		go rx(port)
 		if *isROSneeded {
-			initROS()
+			go initROS()
 		}
 	}
 
@@ -80,7 +79,7 @@ func main() {
 		r.GET("/", func(c *gin.Context) {
 			c.HTML(200, "index.tmpl", gin.H{
 				"isConnected": Arduino.isConnected,
-				"mode":Arduino.mode,
+				"mode":        Arduino.mode,
 			})
 		})
 		// if Arduino.isConnected {
@@ -90,7 +89,7 @@ func main() {
 			Arduino.mode = "slider"
 			c.HTML(200, "index.tmpl", gin.H{
 				"isConnected": Arduino.isConnected,
-				"mode":Arduino.mode,
+				"mode":        Arduino.mode,
 			})
 		})
 
@@ -98,14 +97,14 @@ func main() {
 			Arduino.mode = "joystick"
 			c.HTML(200, "index.tmpl", gin.H{
 				"isConnected": Arduino.isConnected,
-				"mode":Arduino.mode,
+				"mode":        Arduino.mode,
 			})
 		})
 
 		r.GET("/status", func(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"isConnected": Arduino.isConnected,
-				"mode":Arduino.mode,
+				"mode":        Arduino.mode,
 			})
 		})
 		r.GET("/action/on", func(ctx *gin.Context) {
@@ -179,6 +178,12 @@ func main() {
 				"ch_name": command.Ch_name,
 				"value":   command.Value,
 			})
+			switch command.Ch_name {
+			case 0:
+				Arduino.forward = command.Value
+			case 1:
+				Arduino.right = command.Value
+			}
 			command.Action = byte(CSetCh)
 			EasyTransferSend(port, command)
 		})
@@ -192,6 +197,7 @@ func main() {
 
 	}
 
-	for {}
+	for {
+	}
 
 }
