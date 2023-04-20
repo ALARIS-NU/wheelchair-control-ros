@@ -85,7 +85,7 @@ func read_encoder(f io.ReadWriteCloser) {
 				if Arduino.log_speed {
 					data := [][]string{
 						{"Time", "forward", "right", "left_speed", "right_speed"},
-						{string(micros), string(Arduino.forward), string(Arduino.right), strconv.FormatFloat(float64(left_speed), 'f', -1, 32), strconv.FormatFloat(float64(right_speed), 'f', -1, 32)},
+						{strconv.FormatUint(uint64(micros), 10), strconv.FormatUint(uint64(Arduino.forward), 10), strconv.FormatUint(uint64(Arduino.right), 10), strconv.FormatFloat(float64(left_speed), 'f', -1, 32), strconv.FormatFloat(float64(right_speed), 'f', -1, 32)},
 					}
 					for _, row := range data {
 						err := writer.Write(row)
