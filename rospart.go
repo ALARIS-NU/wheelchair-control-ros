@@ -65,6 +65,24 @@ func initROS() {
 		// publish a message every second
 
 		<-r.SleepChan()
+
+		// 0 forward limit 239
+		// 0 back limit 55
+		// 1 right limit 239
+		// 1 left limit 55
+		if Arduino.forward > 238 {
+			Arduino.forward = 238
+		}
+		if Arduino.forward < 56 {
+			Arduino.forward = 56
+		}
+		if Arduino.right > 238 {
+			Arduino.right = 238
+		}
+		if Arduino.right < 56 {
+			Arduino.right = 56
+		}
+
 		msg := &std_msgs.UInt8MultiArray{
 			Data: []uint8{Arduino.forward, Arduino.right},
 		}
