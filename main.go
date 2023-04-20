@@ -10,6 +10,7 @@ import (
 
 type Device struct {
 	isConnected     bool
+	encoder_con     bool
 	mode            string
 	logs            bool
 	rosMasterAdress string
@@ -43,7 +44,8 @@ func main() {
 	rosMasterAdress := flag.String("rosMaster", "127.0.0.1:11311", "ros master adress")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
 	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
-	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path")
+	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path for motor")
+	encoder_port := flag.String("port_encoder", "/dev/tty.usbmodem11101", "serial device abs path for encoders")
 	boudRate := flag.Int("rate", 115200, "serial boudrate uint (9600,115200,?)")
 	flag.Parse()
 	Arduino.logs = *isUARTlogsNeeded
@@ -52,6 +54,15 @@ func main() {
 	// Set up options.
 	options := serial.OpenOptions{
 		PortName: *wordPtr,
+		// PortName:        "/dev/tty.ACM0",
+		BaudRate:        uint(*boudRate),
+		DataBits:        8,
+		StopBits:        1,
+		MinimumReadSize: 4,
+	}
+
+	options_encs := serial.OpenOptions{
+		PortName: *encoder_port,
 		// PortName:        "/dev/tty.ACM0",
 		BaudRate:        uint(*boudRate),
 		DataBits:        8,
@@ -68,6 +79,18 @@ func main() {
 		go rx(port)
 		if *isROSneeded {
 			go initROS()
+		}
+	}
+
+	port_enc, err := serial.Open(options_encs)
+	if err != nil {
+		color.Red("encoder is not connected")
+	} else {
+		Arduino.encoder_con = true
+		defer port_enc.Close()
+		go read_encoder(port_enc)
+		if *isROSneeded {
+			go init_encoder_ROS()
 		}
 	}
 
