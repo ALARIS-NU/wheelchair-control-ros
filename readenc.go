@@ -174,7 +174,7 @@ func init_encoder_ROS() {
 		// publish a message every second
 		// case <-r.SleepChan():
 		msg := &std_msgs.Float32MultiArray{
-			Data: []float32{left_speed, right_speed},
+			Data: []float32{left_speed, -1.0 * right_speed},
 		}
 		// fmt.Printf("Outgoing: %+v\n", msg)
 		pub.Write(msg)
