@@ -3,8 +3,13 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
+	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/aler9/goroslib"
 	"github.com/aler9/goroslib/pkg/msgs/std_msgs"
@@ -37,7 +42,22 @@ var prev_micros uint32
 var left_speed float32
 var right_speed float32
 
+var writer *csv.Writer
+
 func read_encoder(f io.ReadWriteCloser) {
+	if Arduino.log_speed {
+		t := time.Now()
+		filename := fmt.Sprintf("SpeedLog-%d-%02d-%02d_%02d-%02d-%02d.csv", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+
+		file, err := os.Create(filename)
+		if err != nil {
+			log.Fatal("Error creating file:", err)
+		}
+		defer file.Close()
+
+		// Create a new CSV writer
+		writer = csv.NewWriter(file)
+	}
 	color.Green("read_encoder start")
 	reader := bufio.NewReader(f)
 	for {
@@ -62,6 +82,24 @@ func read_encoder(f io.ReadWriteCloser) {
 				left_speed = float32(left_ticks-prev_left_ticks) * 2 * 3.14159 / 2048 / float32(micros-prev_micros) * 1000000
 				right_speed = float32(right_ticks-prev_right_ticks) * 2 * 3.14159 / 2048 / float32(micros-prev_micros) * 1000000
 
+				if Arduino.log_speed {
+					data := [][]string{
+						{"Time", "forward", "right", "left_speed", "right_speed"},
+						{string(micros), string(Arduino.forward), string(Arduino.right), strconv.FormatFloat(float64(left_speed), 'f', -1, 32), strconv.FormatFloat(float64(right_speed), 'f', -1, 32)},
+					}
+					for _, row := range data {
+						err := writer.Write(row)
+						if err != nil {
+							log.Fatal("Error writing row:", err)
+						}
+					}
+
+					writer.Flush()
+
+					if err := writer.Error(); err != nil {
+						log.Fatal("Error flushing writer:", err)
+					}
+				}
 				// fmt.Println("Received packet:", packet)
 				// fmt.Printf("left_speed: %2.2f, right_speed: %2.2f", left_speed, right_speed)
 			}

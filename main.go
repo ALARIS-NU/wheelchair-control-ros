@@ -11,6 +11,7 @@ import (
 type Device struct {
 	isConnected     bool
 	encoder_con     bool
+	log_speed       bool
 	mode            string
 	logs            bool
 	rosMasterAdress string
@@ -43,6 +44,7 @@ func main() {
 	isROSneeded := flag.Bool("ros", true, "do you need a ros node?")
 	rosMasterAdress := flag.String("rosMaster", "127.0.0.1:11311", "ros master adress")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
+	isSpeedLogNeeded := flag.Bool("speed_log", false, "do you need speed logs?")
 	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
 	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path for motor")
 	encoder_port := flag.String("port_encoder", "/dev/tty.usbmodem11101", "serial device abs path for encoders")
@@ -50,6 +52,7 @@ func main() {
 	flag.Parse()
 	Arduino.logs = *isUARTlogsNeeded
 	Arduino.rosMasterAdress = *rosMasterAdress
+	Arduino.log_speed = *isSpeedLogNeeded
 
 	// Set up options.
 	options := serial.OpenOptions{
