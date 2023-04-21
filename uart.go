@@ -69,7 +69,7 @@ func EasyTransferInit(ch chan commandPack) {
 	options := serial.OpenOptions{
 		PortName: *wordPtr,
 		// PortName:        "/dev/tty.ACM0",
-		BaudRate:        uint(*boudRate),
+		BaudRate:        uint(Arduino.boudRate),
 		DataBits:        8,
 		StopBits:        1,
 		MinimumReadSize: 4,

@@ -18,6 +18,7 @@ type Device struct {
 	mode            string
 	logs            bool
 	rosMasterAdress string
+	boudRate        int
 
 	forward byte
 	right   byte
@@ -40,7 +41,6 @@ const (
 var Arduino Device
 var port chan commandPack
 var wordPtr *string
-var boudRate *int
 var isROSneeded *bool
 
 func main() {
@@ -61,10 +61,12 @@ func main() {
 	wordPtr = flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path for motor")
 	encoder_port := flag.String("port_encoder", "/dev/tty.usbmodem11101", "serial device abs path for encoders")
 	boudRate := flag.Int("rate", 115200, "serial boudrate uint (9600,115200,?)")
+
 	flag.Parse()
 	Arduino.logs = *isUARTlogsNeeded
 	Arduino.rosMasterAdress = *rosMasterAdress
 	Arduino.log_speed = *isSpeedLogNeeded
+	Arduino.boudRate = *boudRate
 
 	go EasyTransferInit(port)
 
