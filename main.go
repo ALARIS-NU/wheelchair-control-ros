@@ -66,6 +66,8 @@ func main() {
 	Arduino.rosMasterAdress = *rosMasterAdress
 	Arduino.log_speed = *isSpeedLogNeeded
 
+	go EasyTransferInit(port)
+
 	options_encs := serial.OpenOptions{
 		PortName: *encoder_port,
 		// PortName:        "/dev/tty.ACM0",
