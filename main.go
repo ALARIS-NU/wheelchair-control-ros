@@ -109,4 +109,6 @@ func main() {
 	EasyTransferSend(port, command)
 
 	color.Green("Application terminated gracefully")
+
+	os.Exit(0)
 }
