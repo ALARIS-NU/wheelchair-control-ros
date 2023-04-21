@@ -26,7 +26,7 @@ func init_twistListener() {
 	sub, err := goroslib.NewSubscriber(goroslib.SubscriberConf{
 		Node:     n,
 		Topic:    "wheelchair_twist_listener",
-		Callback: onMessage,
+		Callback: on_twist,
 	})
 	if err != nil {
 		panic(err)
