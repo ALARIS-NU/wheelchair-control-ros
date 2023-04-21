@@ -94,6 +94,7 @@ func main() {
 		go read_encoder(port_enc)
 		if *isROSneeded {
 			go init_encoder_ROS()
+			go init_twistListener()
 		}
 	}
 
