@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/aler9/goroslib"
-	"github.com/aler9/goroslib/pkg/msgs/sensor_msgs"
 	"github.com/aler9/goroslib/pkg/msgs/std_msgs"
 	"github.com/fatih/color"
 )
@@ -33,7 +32,7 @@ func initROS() {
 	// Listen to the topic
 	sub, err := goroslib.NewSubscriber(goroslib.SubscriberConf{
 		Node:     node1,
-		Topic:    "wheelchair_move_command",
+		Topic:    "wheelchair_move_listen",
 		Callback: onMessage,
 	})
 	if err != nil {
@@ -44,7 +43,7 @@ func initROS() {
 	// Publish the Joystick
 	pub, err := goroslib.NewPublisher(goroslib.PublisherConf{
 		Node:  node1,
-		Topic: "wheelchair_user_command",
+		Topic: "wheelchair_move_publish",
 		// Msg:   &Move_command{},
 		Msg: &std_msgs.UInt8MultiArray{},
 	})
@@ -101,6 +100,19 @@ func initROS() {
 	// }()
 }
 
-func onMessage(msg *sensor_msgs.Imu) {
+func onMessage(msg *std_msgs.ByteMultiArray) {
 	fmt.Printf("Incoming: %+v\n", msg)
+	Arduino.forward = byte(msg.Data[0])
+	Arduino.right = byte(msg.Data[1])
+
+	var command commandPack
+	command.Action = byte(CSetCh)
+	command.Ch_name = 0
+	command.Value = Arduino.forward
+	EasyTransferSend(port, command)
+
+	command.Action = byte(CSetCh)
+	command.Ch_name = 1
+	command.Value = Arduino.right
+	EasyTransferSend(port, command)
 }
