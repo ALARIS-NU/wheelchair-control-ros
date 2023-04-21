@@ -76,7 +76,7 @@ func EasyTransferInit(ch chan commandPack) {
 	}
 	port, err := serial.Open(options)
 	if err != nil {
-
+		color.Red("EasyTransfer: error opening port: %v", err)
 	} else {
 		Arduino.isConnected = true
 		color.Green("EasyTransfer: connected to %s", *wordPtr)
@@ -85,36 +85,36 @@ func EasyTransferInit(ch chan commandPack) {
 		if *isROSneeded {
 			go initROS()
 		}
-	}
 
-	for {
-		color.Cyan("EasyTransfer: waiting for data to send\n")
-		in := <-ch
-		color.Yellow("EasyTransfer: sending %v\n", in)
-		size := reflect.TypeOf(in).Size()
-		CS := byte(size)
-		toOut := []byte{0x06, 0x85}
-		toOut = append(toOut, byte(size))
+		for {
+			color.Cyan("EasyTransfer: waiting for data to send\n")
+			in := <-ch
+			color.Yellow("EasyTransfer: sending %v\n", in)
+			size := reflect.TypeOf(in).Size()
+			CS := byte(size)
+			toOut := []byte{0x06, 0x85}
+			toOut = append(toOut, byte(size))
 
-		toOut = append(toOut, in.Action)
-		CS ^= in.Action
-		toOut = append(toOut, in.Ch_name)
-		CS ^= in.Ch_name
-		toOut = append(toOut, in.Value)
-		CS ^= in.Value
+			toOut = append(toOut, in.Action)
+			CS ^= in.Action
+			toOut = append(toOut, in.Ch_name)
+			CS ^= in.Ch_name
+			toOut = append(toOut, in.Value)
+			CS ^= in.Value
 
-		toOut = append(toOut, CS)
-		if Arduino.logs {
-			color.Cyan("Writing %v, as %v bytes using EasyTransfer\n", in, toOut)
-		}
-		if Arduino.isConnected {
-			_, err := port.Write(toOut)
-			if err != nil {
-				log.Fatalf("port.Write: %v", err)
+			toOut = append(toOut, CS)
+			if Arduino.logs {
+				color.Cyan("Writing %v, as %v bytes using EasyTransfer\n", in, toOut)
 			}
-		} else {
-			color.Red("EasyTranfer: no device connected")
-		}
+			if Arduino.isConnected {
+				_, err := port.Write(toOut)
+				if err != nil {
+					log.Fatalf("port.Write: %v", err)
+				}
+			} else {
+				color.Red("EasyTranfer: no device connected")
+			}
 
+		}
 	}
 }
