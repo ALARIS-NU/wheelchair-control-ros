@@ -79,6 +79,7 @@ func EasyTransferInit(ch chan commandPack) {
 
 	} else {
 		Arduino.isConnected = true
+		color.Green("EasyTransfer: connected to %s", *wordPtr)
 		defer port.Close()
 		go rx(port)
 		if *isROSneeded {
@@ -87,9 +88,9 @@ func EasyTransferInit(ch chan commandPack) {
 	}
 
 	for {
-
+		color.Cyan("EasyTransfer: waiting for data to send\n")
 		in := <-ch
-
+		color.Yellow("EasyTransfer: sending %v\n", in)
 		size := reflect.TypeOf(in).Size()
 		CS := byte(size)
 		toOut := []byte{0x06, 0x85}
