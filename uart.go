@@ -77,6 +77,10 @@ func EasyTransferInit(ch chan commandPack) {
 	port, err := serial.Open(options)
 	if err != nil {
 		color.Red("EasyTransfer: error opening port: %v", err)
+		for {
+			in := <-ch
+			color.Red("EasyTransfer: dropped %v", in)
+		}
 	} else {
 		Arduino.isConnected = true
 		color.Green("EasyTransfer: connected to %s", *wordPtr)
