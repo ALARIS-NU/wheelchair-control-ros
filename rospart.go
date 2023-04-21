@@ -100,7 +100,7 @@ func initROS() {
 	// }()
 }
 
-func onMessage(msg *std_msgs.ByteMultiArray) {
+func onMessage(msg *std_msgs.Int8MultiArray) {
 	fmt.Printf("Incoming: %+v\n", msg)
 	Arduino.forward = byte(msg.Data[0])
 	Arduino.right = byte(msg.Data[1])
