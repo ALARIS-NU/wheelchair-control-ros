@@ -16,7 +16,7 @@ import (
 	"github.com/fatih/color"
 )
 
-const logEncoder = true
+// const logEncoder = true
 
 const (
 	preambleFirst  byte = 0x06
@@ -197,16 +197,6 @@ func init_encoder_ROS() {
 		panic(err)
 	}
 	defer pub.Close()
-
-	// Topic list
-	// wheel_left
-	// wheel_right
-	// Rad/sec (single topic) FloatMultiArray[left, right];
-
-	// r := n.TimeRate(1 * time.Second)
-
-	// c := make(chan os.Signal, 1)
-	// signal.Notify(c, os.Interrupt)
 
 	for {
 		// select {

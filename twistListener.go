@@ -10,13 +10,17 @@ import (
 
 func on_twist(msg *geometry_msgs.Twist) {
 	fmt.Printf("Incoming: %+v\n", msg)
-	v := msg.Linear.X
+	v := -msg.Linear.X
 	w := msg.Angular.Z
 
 	L := 0.51 // distance between wheels in meters
 	R := 0.17 // wheel radius in meters
 	WL := (2*v - w*L) / (2 * R)
 	WR := (2*v + w*L) / (2 * R)
+
+	// WL := v - w*L/2
+	// WR := v + w*L/2
+
 	fmt.Printf("WL: %+v, WR: %+v\n", WL, WR)
 
 	v_goal := [2]float64{WL, WR}

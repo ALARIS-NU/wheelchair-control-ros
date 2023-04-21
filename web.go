@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
 	"runtime"
 
@@ -147,10 +146,10 @@ type Page struct {
 	Body  []byte
 }
 
-func (p *Page) save() error {
-	filename := p.Title + ".txt"
-	return os.WriteFile(filename, p.Body, 0600)
-}
+// func (p *Page) save() error {
+// 	filename := p.Title + ".txt"
+// 	return os.WriteFile(filename, p.Body, 0600)
+// }
 
 // func handleAPI(w http.ResponseWriter, r *http.Request) {
 // 	if r.URL.Path[1:] == "status" {
