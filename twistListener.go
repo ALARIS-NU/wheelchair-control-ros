@@ -43,7 +43,7 @@ func on_twist(msg *geometry_msgs.Twist) {
 func init_twistListener() {
 	n, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "goroslib_sub_twist",
-		Namespace:     "/wheelchair/",
+		Namespace:     "/wheelchair",
 		MasterAddress: Arduino.rosMasterAdress,
 	})
 	if err != nil {

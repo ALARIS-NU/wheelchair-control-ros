@@ -22,7 +22,7 @@ func initROS() {
 
 	node1, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "wheelchair_remote",
-		Namespace:     "/wheelchair/",
+		Namespace:     "/wheelchair",
 		MasterAddress: Arduino.rosMasterAdress,
 	})
 	if err != nil {
