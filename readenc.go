@@ -179,6 +179,7 @@ func init_encoder_ROS() {
 	// create a node and connect to the master
 	n, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "goroslib_pub_encoder",
+		Namespace:     "/wheelchair/",
 		MasterAddress: Arduino.rosMasterAdress,
 	})
 	if err != nil {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/aler9/goroslib"
 	"github.com/aler9/goroslib/pkg/msgs/geometry_msgs"
@@ -42,6 +43,7 @@ func on_twist(msg *geometry_msgs.Twist) {
 func init_twistListener() {
 	n, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "goroslib_sub_twist",
+		Namespace:     "/wheelchair/",
 		MasterAddress: Arduino.rosMasterAdress,
 	})
 	if err != nil {
@@ -59,4 +61,7 @@ func init_twistListener() {
 	}
 	defer sub.Close()
 
+	for {
+		time.Sleep(1 * time.Hour)
+	}
 }
