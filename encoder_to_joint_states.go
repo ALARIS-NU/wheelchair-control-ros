@@ -15,6 +15,9 @@ type EncoderToJointStates struct {
 	jointStatesPub            *goroslib.Publisher
 	wheelRadius               float64
 	encoderTicksPerRevolution int
+	prevLeftTicks             int
+	prevRightTicks            int
+	prevTimestamp             time.Time
 }
 
 func NewEncoderToJointStates() (*EncoderToJointStates, error) {
@@ -46,17 +49,27 @@ func NewEncoderToJointStates() (*EncoderToJointStates, error) {
 }
 
 func (e *EncoderToJointStates) publishJointStates() {
-	jointStates := &sensor_msgs.JointState{
-		Header: std_msgs.Header{
-			Stamp: time.Now(),
-		},
-		Name: []string{"left_wheel_joint", "right_wheel_joint"},
-	}
+	now := time.Now()
 
 	leftWheelAngle := (float64(left_ticks) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi)
 	rightWheelAngle := (float64(right_ticks) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi)
 
-	jointStates.Position = []float64{leftWheelAngle, rightWheelAngle}
+	deltaTime := now.Sub(e.prevTimestamp).Seconds()
+	leftWheelVelocity := ((float64(left_ticks) - float64(e.prevLeftTicks)) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi) / deltaTime
+	rightWheelVelocity := ((float64(right_ticks) - float64(e.prevRightTicks)) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi) / deltaTime
+
+	e.prevLeftTicks = left_ticks
+	e.prevRightTicks = right_ticks
+	e.prevTimestamp = now
+
+	jointStates := &sensor_msgs.JointState{
+		Header: std_msgs.Header{
+			Stamp: now,
+		},
+		Name:     []string{"left_wheel_joint", "right_wheel_joint"},
+		Position: []float64{leftWheelAngle, rightWheelAngle},
+		Velocity: []float64{leftWheelVelocity, rightWheelVelocity},
+	}
 
 	e.jointStatesPub.Write(jointStates)
 }
