@@ -156,7 +156,7 @@ func readPacket(reader *bufio.Reader) (SendDataStructure, error) {
 	data.Time = binary.LittleEndian.Uint32(payload[0:4])
 	data.Tiks1 = int32(binary.LittleEndian.Uint32(payload[4:8]))
 	data.Dir1 = payload[8] != 0
-	data.Tiks2 = int32(binary.LittleEndian.Uint32(payload[9:13]))
+	data.Tiks2 = -1 * int32(binary.LittleEndian.Uint32(payload[9:13]))
 	data.Dir2 = payload[13] != 0
 	data.Cast1 = int16(binary.LittleEndian.Uint16(payload[14:16]))
 	data.Cast2 = int16(binary.LittleEndian.Uint16(payload[16:18]))
