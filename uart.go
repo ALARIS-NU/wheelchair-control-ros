@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/jacobsa/go-serial/serial"
 )
 
 func rx(f io.ReadWriteCloser) {
@@ -39,19 +40,19 @@ func rx(f io.ReadWriteCloser) {
 	}
 }
 
-func sendSingleCommand(port io.ReadWriteCloser, command byte) {
-	b := commandPack{command, 0, 0}
-	EasyTransferSend(port, b)
-}
+// func sendSingleCommand(port chan commandPack, command byte) {
+// 	b := commandPack{command, 0, 0}
+// 	EasyTransferSend(port, b)
+// }
 
-func sendCommand(port io.ReadWriteCloser, action byte, x_axis float32, y_axis float32) {
-	x_byte := byte(x_axis + 100)
-	y_byte := byte(y_axis + 100)
-	b := commandPack{action, x_byte, y_byte}
-	EasyTransferSend(port, b)
-	Arduino.forward = y_byte
-	Arduino.right = x_byte
-}
+// func sendCommand(port chan commandPack, action byte, x_axis float32, y_axis float32) {
+// 	x_byte := byte(x_axis + 100)
+// 	y_byte := byte(y_axis + 100)
+// 	b := commandPack{action, x_byte, y_byte}
+// 	EasyTransferSend(port, b)
+// 	Arduino.forward = y_byte
+// 	Arduino.right = x_byte
+// }
 
 type commandPack struct {
 	Action  byte
@@ -59,30 +60,60 @@ type commandPack struct {
 	Value   byte `uri:"value" binding:"number"`
 }
 
-func EasyTransferSend(port io.ReadWriteCloser, in commandPack) {
+func EasyTransferSend(ch chan commandPack, in commandPack) {
+	ch <- in
+}
 
-	size := reflect.TypeOf(in).Size()
-	CS := byte(size)
-	toOut := []byte{0x06, 0x85}
-	toOut = append(toOut, byte(size))
-
-	toOut = append(toOut, in.Action)
-	CS ^= in.Action
-	toOut = append(toOut, in.Ch_name)
-	CS ^= in.Ch_name
-	toOut = append(toOut, in.Value)
-	CS ^= in.Value
-
-	toOut = append(toOut, CS)
-	if Arduino.logs {
-		color.Cyan("Writing %v, as %v bytes using EasyTransfer\n", in, toOut)
+func EasyTransferInit(ch chan commandPack) {
+	// Set up options.
+	options := serial.OpenOptions{
+		PortName: *wordPtr,
+		// PortName:        "/dev/tty.ACM0",
+		BaudRate:        uint(*boudRate),
+		DataBits:        8,
+		StopBits:        1,
+		MinimumReadSize: 4,
 	}
-	if Arduino.isConnected {
-		_, err := port.Write(toOut)
-		if err != nil {
-			log.Fatalf("port.Write: %v", err)
-		}
+	port, err := serial.Open(options)
+	if err != nil {
+
 	} else {
-		color.Red("EasyTranfer: no device connected")
+		Arduino.isConnected = true
+		defer port.Close()
+		go rx(port)
+		if *isROSneeded {
+			go initROS()
+		}
+	}
+
+	for {
+
+		in := <-ch
+
+		size := reflect.TypeOf(in).Size()
+		CS := byte(size)
+		toOut := []byte{0x06, 0x85}
+		toOut = append(toOut, byte(size))
+
+		toOut = append(toOut, in.Action)
+		CS ^= in.Action
+		toOut = append(toOut, in.Ch_name)
+		CS ^= in.Ch_name
+		toOut = append(toOut, in.Value)
+		CS ^= in.Value
+
+		toOut = append(toOut, CS)
+		if Arduino.logs {
+			color.Cyan("Writing %v, as %v bytes using EasyTransfer\n", in, toOut)
+		}
+		if Arduino.isConnected {
+			_, err := port.Write(toOut)
+			if err != nil {
+				log.Fatalf("port.Write: %v", err)
+			}
+		} else {
+			color.Red("EasyTranfer: no device connected")
+		}
+
 	}
 }

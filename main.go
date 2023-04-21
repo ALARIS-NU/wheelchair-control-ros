@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,9 +38,13 @@ const (
 )
 
 var Arduino Device
-var port io.ReadWriteCloser
+var port chan commandPack
+var wordPtr *string
+var boudRate *int
+var isROSneeded *bool
 
 func main() {
+	port = make(chan commandPack)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
@@ -50,28 +53,18 @@ func main() {
 	Arduino.mode = "slider"
 
 	isUARTlogsNeeded := flag.Bool("uart", false, "do you need uart logs?")
-	isROSneeded := flag.Bool("ros", true, "do you need a ros node?")
+	isROSneeded = flag.Bool("ros", true, "do you need a ros node?")
 	rosMasterAdress := flag.String("rosMaster", "127.0.0.1:11311", "ros master adress")
 	isGUIneeded := flag.Bool("gui", true, "do you need GUI?")
 	isSpeedLogNeeded := flag.Bool("speed_log", false, "do you need speed logs?")
 	// wordPtr := flag.String("port", "/dev/tty.usbmodem21201", "serial device abs path")
-	wordPtr := flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path for motor")
+	wordPtr = flag.String("port", "/dev/tty.usbserial-1120", "serial device abs path for motor")
 	encoder_port := flag.String("port_encoder", "/dev/tty.usbmodem11101", "serial device abs path for encoders")
 	boudRate := flag.Int("rate", 115200, "serial boudrate uint (9600,115200,?)")
 	flag.Parse()
 	Arduino.logs = *isUARTlogsNeeded
 	Arduino.rosMasterAdress = *rosMasterAdress
 	Arduino.log_speed = *isSpeedLogNeeded
-
-	// Set up options.
-	options := serial.OpenOptions{
-		PortName: *wordPtr,
-		// PortName:        "/dev/tty.ACM0",
-		BaudRate:        uint(*boudRate),
-		DataBits:        8,
-		StopBits:        1,
-		MinimumReadSize: 4,
-	}
 
 	options_encs := serial.OpenOptions{
 		PortName: *encoder_port,
@@ -80,18 +73,6 @@ func main() {
 		DataBits:        8,
 		StopBits:        1,
 		MinimumReadSize: 4,
-	}
-
-	port, err := serial.Open(options)
-	if err != nil {
-
-	} else {
-		Arduino.isConnected = true
-		defer port.Close()
-		go rx(port)
-		if *isROSneeded {
-			go initROS()
-		}
 	}
 
 	port_enc, err := serial.Open(options_encs)
