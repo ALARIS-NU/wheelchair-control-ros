@@ -2,6 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"io"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
@@ -35,8 +40,13 @@ const (
 )
 
 var Arduino Device
+var port io.ReadWriteCloser
 
 func main() {
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
 	Arduino.isConnected = false
 	Arduino.mode = "slider"
 
@@ -230,7 +240,21 @@ func main() {
 
 	}
 
-	for {
-	}
+	// for {
+	sig := <-sigCh
+	fmt.Println("Received signal:", sig)
+	// }
 
+	var command commandPack
+	command.Action = byte(CSetCh)
+	command.Ch_name = 0
+	command.Value = 174
+	EasyTransferSend(port, command)
+
+	command.Action = byte(CSetCh)
+	command.Ch_name = 1
+	command.Value = 174
+	EasyTransferSend(port, command)
+
+	color.Green("Application terminated gracefully")
 }
