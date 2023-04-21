@@ -54,6 +54,23 @@ func rx(f io.ReadWriteCloser) {
 // 	Arduino.right = x_byte
 // }
 
+func stop_wheelchair(port chan commandPack) {
+	send_joy(port, 174, 174)
+}
+
+func send_joy(port chan commandPack, f byte, r byte) {
+	var command commandPack
+	command.Action = byte(CSetCh)
+	command.Ch_name = 0
+	command.Value = f
+	EasyTransferSend(port, command)
+
+	command.Action = byte(CSetCh)
+	command.Ch_name = 1
+	command.Value = r
+	EasyTransferSend(port, command)
+}
+
 type commandPack struct {
 	Action  byte
 	Ch_name byte `uri:"ch_name"  binding:"number"`

@@ -38,6 +38,8 @@ func on_twist(msg *geometry_msgs.Twist) {
 
 	fmt.Println(f_t)
 
+	send_joy(port, byte(f_t[0]), byte(f_t[1]))
+
 }
 
 func init_twistListener() {

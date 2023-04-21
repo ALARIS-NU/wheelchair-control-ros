@@ -96,22 +96,10 @@ func main() {
 		go init_gin()
 	}
 
-	// for {
 	sig := <-sigCh
 	fmt.Println("Received signal:", sig)
-	// }
 
-	var command commandPack
-	command.Action = byte(CSetCh)
-	command.Ch_name = 0
-	command.Value = 174
-	EasyTransferSend(port, command)
-
-	command.Action = byte(CSetCh)
-	command.Ch_name = 1
-	command.Value = 174
-	EasyTransferSend(port, command)
-
+	stop_wheelchair(port)
 	color.Green("Application terminated gracefully")
 
 	os.Exit(0)
