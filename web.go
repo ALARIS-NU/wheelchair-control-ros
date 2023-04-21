@@ -117,11 +117,11 @@ func init_gin() {
 			"ch_name": command.Ch_name,
 			"value":   command.Value,
 		})
-		if command.Value > 238 {
-			command.Value = 238
+		if command.Value > 235 {
+			command.Value = 235
 		}
-		if command.Value < 56 {
-			command.Value = 56
+		if command.Value < 58 {
+			command.Value = 58
 		}
 		switch command.Ch_name {
 		case 0:
