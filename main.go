@@ -87,8 +87,8 @@ func main() {
 		defer port_enc.Close()
 		go read_encoder(port_enc)
 		if *isROSneeded {
-			go init_encoder_ROS() // is blocking
-			init_twistListener()  // does not block
+			go init_encoder_ROS()   // is blocking
+			go init_twistListener() // does not block
 		}
 	}
 

@@ -18,7 +18,7 @@ import (
 // }
 
 func initROS() {
-	color.Red("initROS")
+	color.Green("initROS")
 
 	node1, err := goroslib.NewNode(goroslib.NodeConf{
 		Name:          "wheelchair_remote",
