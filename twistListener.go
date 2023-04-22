@@ -10,7 +10,7 @@ import (
 
 func on_twist(msg *geometry_msgs.Twist) {
 	fmt.Printf("Incoming: %+v\n", msg)
-	v := msg.Linear.X
+	v := -msg.Linear.X
 	w := msg.Angular.Z
 
 	L := 0.51 // distance between wheels in meters
@@ -37,8 +37,8 @@ func on_twist(msg *geometry_msgs.Twist) {
 		f_t[1] = K1[1][0]*v_goal[0] + K1[1][1]*v_goal[1]
 	}
 
-	f_t[0] = f_t[0] + 171
-	f_t[1] = f_t[1] + 176
+	f_t[0] = f_t[0]/2 + 171
+	f_t[1] = -f_t[1]*8 + 176
 
 	fmt.Println(f_t)
 

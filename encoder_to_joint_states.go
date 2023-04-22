@@ -66,8 +66,8 @@ func (e *EncoderToJointStates) publishJointStates() {
 		Header: std_msgs.Header{
 			Stamp: now,
 		},
-		// Name:     []string{"Rev12", "Rev15"},
-		Name:     []string{"Rev15", "Rev12"},
+		Name: []string{"Rev12", "Rev15"},
+		// Name:     []string{"Rev15", "Rev12"},
 		Position: []float64{leftWheelAngle, rightWheelAngle},
 		Velocity: []float64{leftWheelVelocity, rightWheelVelocity},
 	}
