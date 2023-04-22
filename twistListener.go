@@ -10,7 +10,7 @@ import (
 
 func on_twist(msg *geometry_msgs.Twist) {
 	fmt.Printf("Incoming: %+v\n", msg)
-	v := -msg.Linear.X
+	v := msg.Linear.X
 	w := msg.Angular.Z
 
 	L := 0.51 // distance between wheels in meters
@@ -48,8 +48,11 @@ func on_twist(msg *geometry_msgs.Twist) {
 
 func init_twistListener() {
 	n, err := goroslib.NewNode(goroslib.NodeConf{
-		Name:          "goroslib_sub_twist",
-		Namespace:     "/wheelchair",
+		// Name:          "goroslib_sub_twist",
+		// Namespace:     "/wheelchair",
+		// /wheelchair_velocity_controller/cmd_vel
+		Name:          "cmd_vel",
+		Namespace:     "/wheelchair_velocity_controller",
 		MasterAddress: Arduino.rosMasterAdress,
 	})
 	if err != nil {
@@ -58,8 +61,9 @@ func init_twistListener() {
 	defer n.Close()
 	// create a subscriber
 	sub, err := goroslib.NewSubscriber(goroslib.SubscriberConf{
-		Node:     n,
-		Topic:    "wheelchair_twist_listener",
+		Node:  n,
+		Topic: "cmd_vel",
+		// Topic:    "wheelchair_twist_listener",
 		Callback: on_twist,
 	})
 	if err != nil {

@@ -33,8 +33,6 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <cmath>
 #include <sensor_msgs/JointState.h>
-#include <std_msgs/Float32MultiArray.h>
-
  
 // Create odometry data publishers
 ros::Publisher odom_data_pub;
@@ -72,7 +70,7 @@ void set_initial_2d(const geometry_msgs::PoseStamped &rvizClick) {
 }
  
 // Update odometry information
-void update_odom(const std_msgs::Float32MultiArray &msg) {
+void update_odom(const sensor_msgs::JointState &msg) {
   // Specific constants
   double B = 0.3765; // distance between the wheels
   double alpha = 1.0; // handpicked parameter
@@ -80,8 +78,8 @@ void update_odom(const std_msgs::Float32MultiArray &msg) {
   double scale = 1.0/alpha*B;
   // Here we convert incoming message to right and left velocity
   double message[2]={0.0, 0.0};
-  message[1]=(msg.data[1]); // avg of right wheels
-  message[0]=(msg.data[0]); // avg of left wheels
+  message[0]=(0.5*msg.velocity[1]); // avg of right wheels
+  message[1]=(0.5*msg.velocity[0]); // avg of left wheels
   odomNew.header.stamp = ros::Time::now();
   double delta_time = (odomNew.header.stamp.toSec() - odomOld.header.stamp.toSec());
   // Calculate the average distance
@@ -164,10 +162,12 @@ int main(int argc, char **argv) {
   ros::Subscriber subInitialPose = node.subscribe("initial_2d", 1, set_initial_2d);
  
   // Publisher of simple odom message where orientation.z is an euler angle
-  odom_data_pub = node.advertise<nav_msgs::Odometry>("/wheelchair_velocity_controller/odom", 100);
+  //odom_data_pub = node.advertise<nav_msgs::Odometry>("/jackal_velocity_controller/odom", 100);
+  odom_data_pub = node.advertise<nav_msgs::Odometry>("/wheelchair/custom_odom", 100);
 
   // Subscribe to ROS topics
-  ros::Subscriber sim_updater = node.subscribe("/encoder_rad", 1, update_odom);
+  //ros::Subscriber sim_updater = node.subscribe("/joint_states", 1, update_odom);
+  ros::Subscriber sim_updater = node.subscribe("/wheelchair/joint_states", 1, update_odom);
 
  
   ros::Rate loop_rate(100); 

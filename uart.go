@@ -59,6 +59,19 @@ func stop_wheelchair(port chan commandPack) {
 }
 
 func send_joy(port chan commandPack, f byte, r byte) {
+	if f < 56 {
+		f = 56
+	}
+	if f > 238 {
+		f = 238
+	}
+	if r < 56 {
+		r = 56
+	}
+	if r > 238 {
+		r = 238
+	}
+
 	var command commandPack
 	command.Action = byte(CSetCh)
 	command.Ch_name = 0
