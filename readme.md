@@ -1,3 +1,14 @@
+# How to start ROS?
+Start this in ALARIS-wheelchairControl/wheelchair_src
+```Bash
+roslaunch wheelchair_description spawn_wheelchair.launch 
+```
+Then start this is ALARIS-wheelchairControl/
+```Bash
+go run . --port /dev/ttyUSB0 --port_encoder /dev/ttyACM0 --gui=False
+```
+This is enough for now.
+
 ## pinout
 ```
 const byte ch1pins[] = {
