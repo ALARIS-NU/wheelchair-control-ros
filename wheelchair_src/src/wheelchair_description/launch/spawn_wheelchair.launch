@@ -11,7 +11,8 @@
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
     args="-param robot_description -urdf -model wheelchair  -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
   <node pkg="wheelchair_description" type="wheelchair_description" name="custom_odom_pkg"/>
+  <!-- <node pkg="zed_wrapper" type="zed" name="zed_wrapper_launch"/> -->
   
 
-  <node name="rvizz" pkg="rviz" type="rviz" args="-d $(find wheelchair_description)/config/rviz.rviz"/>
+  <!-- <node name="rvizz" pkg="rviz" type="rviz" args="-d $(find wheelchair_description)/config/rviz.rviz"/> -->
 </launch>
