@@ -6,10 +6,16 @@ import (
 
 	"github.com/aler9/goroslib"
 	"github.com/aler9/goroslib/pkg/msgs/geometry_msgs"
+	"github.com/fatih/color"
 )
 
 func on_twist(msg *geometry_msgs.Twist) {
 	fmt.Printf("Incoming: %+v\n", msg)
+	if Arduino.eStop {
+		color.Red("eStop is up, twist ignored")
+		return
+	}
+
 	v := -msg.Linear.X
 	w := msg.Angular.Z
 
@@ -38,7 +44,21 @@ func on_twist(msg *geometry_msgs.Twist) {
 	}
 
 	f_t[0] = f_t[0]/2 + 171
-	f_t[1] = -f_t[1]*8 + 176
+	f_t[1] = f_t[1]*8 + 176
+
+	//constrain to byte before casting and sending
+	if f_t[0] < 0 {
+		f_t[0] = 0
+	}
+	if f_t[0] > 255 {
+		f_t[0] = 255
+	}
+	if f_t[1] < 0 {
+		f_t[1] = 0
+	}
+	if f_t[1] > 255 {
+		f_t[1] = 255
+	}
 
 	fmt.Println(f_t)
 

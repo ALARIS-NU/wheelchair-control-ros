@@ -35,6 +35,7 @@
                     <option value="Slider">Slider</option>
                     <option value="Joystick">Joystick</option>
                 </select>
+                <button @click="eStop" class="w3-button w3-amber">eStop</button>
 
                 <div x-show="mode == 'slider'">
                     <template x-ref="sliderz" x-for="(Channel, index) in Channels" :key="index">
@@ -79,6 +80,17 @@
                 
             }
             location.reload();
+        }
+
+        function eStop(){
+            fetch('/stop')
+            .then(response => {
+                console.log('Success:', response);
+                window.location.href = '/static/pages/estopped.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
 
         function sliderEvent(id, val){

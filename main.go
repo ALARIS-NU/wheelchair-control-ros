@@ -19,6 +19,7 @@ type Device struct {
 	logs            bool
 	rosMasterAdress string
 	boudRate        int
+	eStop           bool
 
 	forward byte
 	right   byte
@@ -42,8 +43,11 @@ var Arduino Device
 var port chan commandPack
 var wordPtr *string
 var isROSneeded *bool
+var eStop bool
 
 func main() {
+	Arduino.eStop = false
+
 	port = make(chan commandPack)
 
 	sigCh := make(chan os.Signal, 1)

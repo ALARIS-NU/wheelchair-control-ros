@@ -62,12 +62,23 @@ func (e *EncoderToJointStates) publishJointStates() {
 	e.prevRightTicks = right_ticks
 	e.prevTimestamp = now
 
+	// leftWheelAngle := (float64(right_ticks) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi)
+	// rightWheelAngle := (float64(left_ticks) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi)
+
+	// deltaTime := now.Sub(e.prevTimestamp).Seconds()
+	// leftWheelVelocity := ((float64(right_ticks) - float64(e.prevRightTicks)) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi) / deltaTime
+	// rightWheelVelocity := ((float64(left_ticks) - float64(e.prevLeftTicks)) / float64(e.encoderTicksPerRevolution)) * (2 * math.Pi) / deltaTime
+
+	// e.prevLeftTicks = right_ticks
+	// e.prevRightTicks = left_ticks
+	// e.prevTimestamp = now
+
 	jointStates := &sensor_msgs.JointState{
 		Header: std_msgs.Header{
 			Stamp: now,
 		},
 		Name: []string{"Rev12", "Rev15"},
-		// Name:     []string{"Rev15", "Rev12"},
+		//Name:     []string{"Rev15", "Rev12"},
 		Position: []float64{leftWheelAngle, rightWheelAngle},
 		Velocity: []float64{leftWheelVelocity, rightWheelVelocity},
 	}
