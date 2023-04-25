@@ -1,6 +1,8 @@
-v = 0; %1.11; % m/s which is 4km/h
+v = 0.9; %1.11; % m/s which is 4km/h
+
+v = -v;
 % v = .83; % m/s which is 3km/h
-w = 15;
+w = 0;
 
 L = 0.51; % m
 R = 0.17; % m
@@ -15,5 +17,6 @@ else
     f_t = K1*v_goal;
 end
 
-f_t/2 + [171; 176]
+(f_t.*[1/2; -8] + [171; 176])
+
 
