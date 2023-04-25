@@ -55,33 +55,36 @@ func rx(f io.ReadWriteCloser) {
 // }
 
 func stop_wheelchair(port chan commandPack) {
-	send_joy(port, 174, 174)
-}
-
-func send_joy(port chan commandPack, f byte, r byte) {
-	if f < 56 {
-		f = 56
-	}
-	if f > 238 {
-		f = 238
-	}
-	if r < 56 {
-		r = 56
-	}
-	if r > 238 {
-		r = 238
-	}
 
 	var command commandPack
 	command.Action = byte(CSetCh)
 	command.Ch_name = 0
-	command.Value = f
+	command.Value = 171
 	EasyTransferSend(port, command)
 
 	command.Action = byte(CSetCh)
 	command.Ch_name = 1
-	command.Value = r
+	command.Value = 171
 	EasyTransferSend(port, command)
+
+}
+
+func send_joy(port chan commandPack, f byte, r byte) {
+	if Arduino.eStop {
+		stop_wheelchair(port)
+	} else {
+
+		var command commandPack
+		command.Action = byte(CSetCh)
+		command.Ch_name = 0
+		command.Value = f
+		EasyTransferSend(port, command)
+
+		command.Action = byte(CSetCh)
+		command.Ch_name = 1
+		command.Value = r
+		EasyTransferSend(port, command)
+	}
 }
 
 type commandPack struct {
@@ -91,7 +94,10 @@ type commandPack struct {
 }
 
 func EasyTransferSend(ch chan commandPack, in commandPack) {
+	// if Arduino.eStop {
 	ch <- in
+	// }
+
 }
 
 func EasyTransferInit(ch chan commandPack) {
@@ -123,6 +129,14 @@ func EasyTransferInit(ch chan commandPack) {
 		for {
 			color.Cyan("EasyTransfer: waiting for data to send\n")
 			in := <-ch
+			low := byte(60)
+			high := byte(230)
+			if in.Value < low {
+				in.Value = low
+			}
+			if in.Value > high {
+				in.Value = high
+			}
 			color.Yellow("EasyTransfer: sending %v\n", in)
 			size := reflect.TypeOf(in).Size()
 			CS := byte(size)

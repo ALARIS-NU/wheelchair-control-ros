@@ -46,10 +46,10 @@ const double initialTheta = 0.00000000001;
 const double PI = 3.141592;
  
 // Robot physical constants
-const double TICKS_PER_REVOLUTION = 620; // For reference purposes.
+// const double TICKS_PER_REVOLUTION = 620; // For reference purposes.
 const double WHEEL_RADIUS = 0.17; // Wheel radius in meters
 const double WHEEL_BASE = 0.515; // Center of left tire to center of right tire
-const double TICKS_PER_METER = 3100; // Original was 2800
+// const double TICKS_PER_METER = 3100; // Original was 2800
  
 // Distance both wheels have traveled
 double distanceLeft = 0;
@@ -72,14 +72,15 @@ void set_initial_2d(const geometry_msgs::PoseStamped &rvizClick) {
 // Update odometry information
 void update_odom(const sensor_msgs::JointState &msg) {
   // Specific constants
-  double B = 0.3765; // distance between the wheels
+  // double B = 0.3765; // distance between the wheels
+  double B = WHEEL_BASE;
   double alpha = 1.0; // handpicked parameter
   double r_wheel = 0.17; // wheel radius
   double scale = 1.0/alpha*B;
   // Here we convert incoming message to right and left velocity
   double message[2]={0.0, 0.0};
-  message[0]=(0.5*msg.velocity[1]); // avg of right wheels
-  message[1]=(0.5*msg.velocity[0]); // avg of left wheels
+  message[0]=(0.5*msg.velocity[0]); // avg of right wheels
+  message[1]=(0.5*msg.velocity[1]); // avg of left wheels
   odomNew.header.stamp = ros::Time::now();
   double delta_time = (odomNew.header.stamp.toSec() - odomOld.header.stamp.toSec());
   // Calculate the average distance
@@ -141,6 +142,7 @@ int main(int argc, char **argv) {
    
   // Set the data fields of the odometry message
   odomNew.header.frame_id = "odom";
+  odomNew.child_frame_id = "base_link";
   odomNew.pose.pose.position.z = 0;
   odomNew.pose.pose.orientation.x = 0;
   odomNew.pose.pose.orientation.y = 0;

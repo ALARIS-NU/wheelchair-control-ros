@@ -103,41 +103,60 @@ func init_gin() {
 	})
 	r.GET("/action/:ch_name/:value", func(ctx *gin.Context) {
 		var command commandPack
-		if err := ctx.ShouldBindUri(&command); err != nil {
-			ctx.JSON(400, gin.H{"error": "could not bind command", "msg": err})
-			return
+		if Arduino.eStop {
+			color.Red("eStop is up, GET request ignored")
+			if err := ctx.ShouldBindUri(&command); err != nil {
+				ctx.JSON(400, gin.H{"error": "eStop is up", "msg": err})
+				return
+			}
+		} else {
+			// color.Cyan("recieved {}:{} on web", command.Ch_name, command.Value)
+			if err := ctx.ShouldBindUri(&command); err != nil {
+				ctx.JSON(400, gin.H{"error": "could not bind command", "msg": err})
+				return
+			}
+			if command.Ch_name > 4 {
+				ctx.JSON(400, gin.H{"msg": "channel name out of bound [1..4]"})
+				return
+			}
+			ctx.JSON(200, gin.H{
+				"status":  "ok",
+				"command": CSetCh,
+				"ch_name": command.Ch_name,
+				"value":   command.Value,
+			})
+
+			switch command.Ch_name {
+			case 0:
+				Arduino.forward = command.Value
+			case 1:
+				Arduino.right = command.Value
+			}
+			command.Action = byte(CSetCh)
+			EasyTransferSend(port, command)
 		}
-		if command.Ch_name > 4 {
-			ctx.JSON(400, gin.H{"msg": "channel name out of bound [1..4]"})
-			return
-		}
-		ctx.JSON(200, gin.H{
-			"status":  "ok",
-			"command": CSetCh,
-			"ch_name": command.Ch_name,
-			"value":   command.Value,
-		})
-		if command.Value > 235 {
-			command.Value = 235
-		}
-		if command.Value < 58 {
-			command.Value = 58
-		}
-		switch command.Ch_name {
-		case 0:
-			Arduino.forward = command.Value
-		case 1:
-			Arduino.right = command.Value
-		}
-		command.Action = byte(CSetCh)
-		EasyTransferSend(port, command)
 	})
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
+	r.GET("/stop", func(c *gin.Context) {
+		Arduino.eStop = true
+		stop_wheelchair(port)
+		c.JSON(200, gin.H{
+			"message": "stopped",
+		})
+	})
+	r.GET("/stop_gui", func(c *gin.Context) {
+		Arduino.eStop = true
+		stop_wheelchair(port)
+		c.Redirect(302, "/static/pages/estopped.html")
+	})
+
 	openbrowser("http://localhost:8080")
+	openbrowser("http://localhost:8080/static/pages/stop.html")
+
 	r.Run()
 }
 
